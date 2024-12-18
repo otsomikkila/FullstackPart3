@@ -36,43 +36,23 @@ const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
 
-
-let data = [
-    { 
-      "id": "1",
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": "2",
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": "3",
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": "4",
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(person => {
     response.json(person)
   })
 })
 
-app.get('/info', (request, response) => {
+app.get('/info', async (request, response, next) => {
     const date = new Date()
-    //console.log(express.responseTime())
+    
+    const count = await Person.countDocuments().catch (error => next(error))
+  
     response.send(`
-        <p>Phonebook has info for ${data.length} people</p>
+        <p>Phonebook has info for ${count} people</p>
         <p>${date.toString()}</p>
     `)
-})
+  } 
+)
 
 app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
