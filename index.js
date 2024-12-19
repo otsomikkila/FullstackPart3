@@ -1,9 +1,9 @@
 const express = require('express')
 const app = express()
-require('dotenv').config();
+require('dotenv').config()
 const morgan = require('morgan')  //request logger
 
-const Person = require("./models/person")
+const Person = require('./models/person')
 
 app.use(express.static('dist'))
 
@@ -30,7 +30,7 @@ app.use(morgan(function (tokens, req, res) {
     tokens.status(req, res),
     tokens.res(req, res, 'content-length'), '-',
     tokens['response-time'](req, res), 'ms',
-    JSON.stringify({"name":req.body.name, "number":req.body.number})
+    JSON.stringify({ 'name':req.body.name, 'number':req.body.number })
   ].join(' ')
 }))
 
@@ -45,16 +45,14 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/info', async (request, response, next) => {
-    const date = new Date()
-    
-    const count = await Person.countDocuments().catch (error => next(error))
-  
-    response.send(`
-        <p>Phonebook has info for ${count} people</p>
-        <p>${date.toString()}</p>
-    `)
-  } 
-)
+  const date = new Date()
+  const count = await Person.countDocuments().catch (error => next(error))
+
+  response.send(`
+      <p>Phonebook has info for ${count} people</p>
+      <p>${date.toString()}</p>
+  `)
+})
 
 app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
@@ -65,29 +63,31 @@ app.get('/api/persons/:id', (request, response, next) => {
         response.status(404).end()
       }
     })
-    .catch(error => next(error))   
+    .catch(error => next(error))
 })
 
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
     .then(result => {
+      console.log(result)
+      console.log(response)
       response.status(204).end()
     })
     .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response, next) => {
-    const body = request.body
+  const body = request.body
 
-    const person = new Person({
-      name: body.name,
-      number: body.number
-    })
+  const person = new Person({
+    name: body.name,
+    number: body.number
+  })
 
-    person.save().then(savedPerson => {
-      response.json(savedPerson)
-    })
+  person.save().then(savedPerson => {
+    response.json(savedPerson)
+  })
     .catch(error => next(error))
 })
 
